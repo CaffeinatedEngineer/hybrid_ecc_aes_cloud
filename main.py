@@ -6,16 +6,22 @@ NOVELTY: Demonstrates ECC-based hybrid encryption for cloud workloads
 
 import json
 import time
-from src.crypto.hybrid_encryption import HybridECCAES
-from src.cloud.aws_handler import AWSCloudHandler
-from src.benchmarks.performance_tests import PerformanceBenchmark
+import os
+import sys
+
+# Add the src directory to Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+
+from crypto.hybrid_encryption import HybridECCAES
+from cloud.aws_handler import AWSCloudHandler
+from benchmarks.performance_tests import PerformanceBenchmark
 
 def demo_basic_encryption():
     """Demonstrate basic hybrid ECC-AES encryption."""
     print("🔐 Hybrid ECC-AES Cloud Workload Encryption Demo")
     print("=" * 50)
     
-    # Initialize hybrid system
+    # Initialize hybrid system (no keys needed - auto-generated)
     hybrid_system = HybridECCAES(ecc_curve="secp256r1", aes_key_size=256)
     
     # Sample cloud workload data
@@ -62,14 +68,13 @@ def demo_basic_encryption():
     return encrypted_package, decrypted_result
 
 def demo_cloud_integration():
-    """Demonstrate cloud storage integration."""
-    print("\n☁️  Cloud Integration Demo")
-    print("=" * 30)
+    """Demonstrate cloud storage integration (simulation mode)."""
+    print("\n☁️  Cloud Integration Demo (Simulation Mode)")
+    print("=" * 45)
     
-    # Note: This requires AWS credentials and S3 bucket
-    # For demo purposes, we'll simulate the process
-    
+    # Use simulation mode (no AWS credentials needed)
     hybrid_system = HybridECCAES()
+    aws_handler = AWSCloudHandler(region_name='eu-west-1', use_simulation=True)
     
     # Encrypt a workload
     workload_data = "Sensitive cloud workload data that needs protection"
@@ -83,14 +88,20 @@ def demo_cloud_integration():
     print(f"Cloud region: {encrypted_package['cloud_region']}")
     print(f"Workload type: {encrypted_package['workload_type']}")
     
-    # Simulate cloud upload (uncomment for real AWS integration)
-    # aws_handler = AWSCloudHandler(region_name='eu-west-1')
-    # s3_url = aws_handler.upload_encrypted_workload(
-    #     bucket_name='your-secure-bucket',
-    #     workload_package=encrypted_package,
-    #     object_key='workloads/encrypted_workload_001.json'
-    # )
-    # print(f"📤 Uploaded to: {s3_url}")
+    # Simulate cloud upload
+    s3_url = aws_handler.upload_encrypted_workload(
+        bucket_name='your-secure-bucket',
+        workload_package=encrypted_package,
+        object_key='workloads/encrypted_workload_001.json'
+    )
+    print(f"📤 Simulated upload to: {s3_url}")
+    
+    # Simulate download
+    downloaded_package = aws_handler.download_encrypted_workload(
+        bucket_name='your-secure-bucket',
+        object_key='workloads/encrypted_workload_001.json'
+    )
+    print("📥 Simulated download completed")
 
 def demo_performance_benchmark():
     """Demonstrate performance benchmarking."""
@@ -107,24 +118,34 @@ def demo_performance_benchmark():
     print("\nTesting different ECC curves...")
     curve_results = benchmark.benchmark_curve_comparison()
     
-    # Plot results
-    benchmark.plot_performance_results()
+    # Plot results (will save as image file)
+    try:
+        benchmark.plot_performance_results()
+        print("📈 Performance charts saved as 'hybrid_ecc_aes_performance.png'")
+    except Exception as e:
+        print(f"⚠️  Could not generate plots: {e}")
     
     return results, curve_results
 
 if __name__ == "__main__":
     # Run demos
     try:
+        print("🚀 Starting Hybrid ECC-AES Cloud Encryption Demos...\n")
+        
         # Basic encryption demo
         encrypted_package, decrypted_result = demo_basic_encryption()
         
-        # Cloud integration demo
+        # Cloud integration demo (simulation)
         demo_cloud_integration()
         
         # Performance benchmark demo
         results, curve_results = demo_performance_benchmark()
         
         print("\n🎉 All demos completed successfully!")
+        print("\n📋 Summary:")
+        print(f"   - Encryption/Decryption: ✅ Working")
+        print(f"   - Cloud Integration: ✅ Simulated")
+        print(f"   - Performance Benchmarks: ✅ Completed")
         
     except Exception as e:
         print(f"❌ Demo failed: {e}")
