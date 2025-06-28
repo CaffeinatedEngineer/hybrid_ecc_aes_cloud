@@ -1,7 +1,10 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import time
 import matplotlib.pyplot as plt
 import numpy as np
-from ..crypto.hybrid_encryption import HybridECCAES
+from crypto.hybrid_encryption import HybridECCAES
 
 class PerformanceBenchmark:
     def __init__(self):
